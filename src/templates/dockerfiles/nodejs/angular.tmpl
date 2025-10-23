@@ -53,4 +53,4 @@ COPY --from=build /app/{{BUILD_OUTPUT_DIR}} ./{{BUILD_OUTPUT_DIR}}
 EXPOSE {{PORT}}
 
 # Start the application with SPA support and caching
-CMD ["--root", "{{BUILD_OUTPUT_DIR}}", "--port", "{{PORT}}", "--page-fallback", "{{BUILD_OUTPUT_DIR}}/index.html"]
+CMD ["/static-web-server", "--root", "{{BUILD_OUTPUT_DIR}}", "--port", "{{PORT}}", "--page-fallback", "{{BUILD_OUTPUT_DIR}}/index.html"]
