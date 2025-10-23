@@ -20,7 +20,7 @@ import path from 'path';
 const program = new Command();
 
 program
-  .name('docker-file-gen')
+  .name('dockerfile-gen')
   .description('Generate Dockerfiles for any programming language and framework')
   .version('1.0.0')
   .argument('<source-path>', 'Path to the source code directory')

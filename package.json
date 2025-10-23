@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "type": "module",
   "bin": {
-    "docker-file-gen": "src/cli.js"
+    "dockerfile-gen": "src/cli.js"
   },
   "files": [
     "src/",
