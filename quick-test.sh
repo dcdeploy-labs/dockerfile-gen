@@ -6,7 +6,7 @@
 echo "=== Quick Remote Docker Testing Commands ==="
 echo
 echo "1. Test React App:"
-echo "   ./test-remote.sh react-app 3000"
+echo "   REMOTE_HOST=\$REMOTE_HOST ./test-react-remote.sh"
 echo
 echo "2. Test Express App:"
 echo "   ./test-remote.sh express-app 3000"

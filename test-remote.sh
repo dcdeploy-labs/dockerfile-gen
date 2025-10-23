@@ -99,9 +99,9 @@ copy_to_remote() {
     # Copy only necessary files, excluding node_modules, dist, build, etc.
     rsync -av --exclude='node_modules' --exclude='dist' --exclude='build' --exclude='.next' --exclude='__pycache__' --exclude='*.pyc' --exclude='.git' --exclude='.DS_Store' --exclude='Dockerfile' "$EXAMPLE_PATH/" "$TEMP_DIR/"
     
-    # Generate Dockerfile using published dockerfile-gen tool
-    echo "Generating Dockerfile for $EXAMPLE_NAME using npx @dcdeploy/dockerfile-gen..."
-    npx @dcdeploy/dockerfile-gen@latest "$TEMP_DIR" --output "$TEMP_DIR/Dockerfile" --verbose
+           # Generate Dockerfile using published dockerfile-gen tool
+           echo "Generating Dockerfile for $EXAMPLE_NAME using npx @dcdeploy/dockerfile-gen..."
+           npx @dcdeploy/dockerfile-gen@1.0.3 "$TEMP_DIR" --output "$TEMP_DIR/Dockerfile" --verbose
     
     # Verify files were generated
     if [ ! -f "$TEMP_DIR/Dockerfile" ]; then
