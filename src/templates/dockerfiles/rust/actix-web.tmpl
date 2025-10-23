@@ -1,0 +1,60 @@
+# Build stage
+FROM {{BUILD_IMAGE}} AS builder
+
+# Set ARG variables
+{{BUILD_ARG_VARS}}
+
+# Set environment variables
+{{BUILD_ENV_VARS}}
+
+# Set the working directory
+WORKDIR {{WORKDIR}}
+
+# Install system dependencies
+{{BUILD_SYSTEM_DEPS}}
+
+# Additional RUN commands
+{{BUILD_ADDITIONAL_RUN_CMDS}}
+
+# Copy Cargo files
+COPY Cargo.toml Cargo.lock ./
+
+# Create a dummy main.rs to build dependencies
+RUN mkdir src && echo "fn main() {}" > src/main.rs
+
+# Build dependencies
+RUN cargo build --release
+
+# Copy source code
+COPY src ./src
+
+# Build the application
+RUN cargo build --release
+
+# Runtime stage
+FROM {{RUN_IMAGE}}
+
+# Set ARG variables
+{{RUNTIME_ARG_VARS}}
+
+# Set environment variables
+{{RUNTIME_ENV_VARS}}
+
+# Set the working directory
+WORKDIR {{WORKDIR}}
+
+# Install system dependencies
+{{RUNTIME_SYSTEM_DEPS}}
+
+# Additional RUN commands
+{{RUNTIME_ADDITIONAL_RUN_CMDS}}
+
+# Copy the binary from builder stage
+COPY --from=builder /app/target/release/app .
+
+# Expose port
+EXPOSE {{PORT}}
+
+# Run the binary
+CMD ["./app"]
+

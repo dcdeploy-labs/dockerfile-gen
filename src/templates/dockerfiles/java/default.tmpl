@@ -1,0 +1,56 @@
+# Build stage
+FROM {{BUILD_IMAGE}} AS builder
+
+# Set ARG variables
+{{BUILD_ARG_VARS}}
+
+# Set environment variables
+{{BUILD_ENV_VARS}}
+
+# Set the working directory
+WORKDIR {{WORKDIR}}
+
+# Install system dependencies
+{{BUILD_SYSTEM_DEPS}}
+
+# Additional RUN commands
+{{BUILD_ADDITIONAL_RUN_CMDS}}
+
+# Copy pom.xml
+COPY pom.xml .
+
+# Download dependencies
+RUN mvn dependency:go-offline -B
+
+# Copy source code
+COPY src ./src
+
+# Build the application
+RUN mvn clean package -DskipTests
+
+# Runtime stage
+FROM {{RUN_IMAGE}}
+
+# Set ARG variables
+{{RUNTIME_ARG_VARS}}
+
+# Set environment variables
+{{RUNTIME_ENV_VARS}}
+
+# Set the working directory
+WORKDIR {{WORKDIR}}
+
+# Install system dependencies
+{{RUNTIME_SYSTEM_DEPS}}
+
+# Additional RUN commands
+{{RUNTIME_ADDITIONAL_RUN_CMDS}}
+
+# Copy the jar file from builder stage
+COPY --from=builder /app/target/*.jar app.jar
+
+# Expose port
+EXPOSE {{PORT}}
+
+# Run the application
+CMD ["java", "-jar", "app.jar"]

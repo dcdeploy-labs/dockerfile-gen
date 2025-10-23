@@ -1,0 +1,57 @@
+# Build stage
+FROM {{BUILD_IMAGE}} AS build
+
+# Set ARG variables
+{{BUILD_ARG_VARS}}
+
+# Set environment variables
+{{BUILD_ENV_VARS}}
+
+# Set the working directory
+WORKDIR {{WORKDIR}}
+
+# Install system dependencies
+{{BUILD_SYSTEM_DEPS}}
+
+# Additional RUN commands
+{{BUILD_ADDITIONAL_RUN_CMDS}}
+
+# Copy package files
+COPY {{PACKAGE_FILES}} ./
+
+# Install dependencies
+RUN {{BUILD_INSTALL_CMD}}
+
+# Copy source code
+COPY . .
+
+# Build the application
+RUN {{BUILD_CMD}}
+
+# Production stage
+FROM nginx:alpine
+
+# Set ARG variables
+{{RUNTIME_ARG_VARS}}
+
+# Set environment variables
+{{RUNTIME_ENV_VARS}}
+
+# Install system dependencies
+{{RUNTIME_SYSTEM_DEPS}}
+
+# Additional RUN commands
+{{RUNTIME_ADDITIONAL_RUN_CMDS}}
+
+# Copy the built app to nginx
+COPY --from=build /app/{{BUILD_OUTPUT_DIR}} /usr/share/nginx/html
+
+# Copy nginx configuration
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Expose port
+EXPOSE {{PORT}}
+
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]
+

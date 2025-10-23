@@ -1,0 +1,95 @@
+# Use the official Node.js runtime as the base image
+FROM {{BUILD_IMAGE}} AS base
+
+# Set ARG variables
+{{BUILD_ARG_VARS}}
+
+# Install dependencies only when needed
+FROM base AS deps
+
+# Set ARG variables
+{{BUILD_ARG_VARS}}
+
+# Set environment variables
+{{BUILD_ENV_VARS}}
+
+# Set the working directory
+WORKDIR {{WORKDIR}}
+
+# Install system dependencies
+{{BUILD_SYSTEM_DEPS}}
+
+# Additional RUN commands
+{{BUILD_ADDITIONAL_RUN_CMDS}}
+
+# Install dependencies
+COPY {{PACKAGE_FILES}} ./
+RUN {{BUILD_INSTALL_CMD}}
+
+# Rebuild the source code only when needed
+FROM base AS builder
+
+# Set ARG variables
+{{BUILD_ARG_VARS}}
+
+# Set environment variables
+{{BUILD_ENV_VARS}}
+
+# Set the working directory
+WORKDIR {{WORKDIR}}
+
+# Install system dependencies
+{{BUILD_SYSTEM_DEPS}}
+
+# Additional RUN commands
+{{BUILD_ADDITIONAL_RUN_CMDS}}
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+# Next.js collects completely anonymous telemetry data about general usage.
+ENV NEXT_TELEMETRY_DISABLED 1
+
+RUN {{BUILD_CMD}}
+
+# Production image, copy all the files and run next
+FROM base AS runner
+
+# Set ARG variables
+{{RUNTIME_ARG_VARS}}
+
+# Set environment variables
+{{RUNTIME_ENV_VARS}}
+
+# Set the working directory
+WORKDIR {{WORKDIR}}
+
+# Install system dependencies
+{{RUNTIME_SYSTEM_DEPS}}
+
+# Additional RUN commands
+{{RUNTIME_ADDITIONAL_RUN_CMDS}}
+
+ENV NODE_ENV production
+ENV NEXT_TELEMETRY_DISABLED 1
+
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+COPY --from=builder /app/public ./public
+
+# Set the correct permission for prerender cache
+RUN mkdir .next
+RUN chown nextjs:nodejs .next
+
+# Automatically leverage output traces to reduce image size
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+USER nextjs
+
+EXPOSE {{PORT}}
+
+ENV PORT {{PORT}}
+ENV HOSTNAME "0.0.0.0"
+
+CMD ["node", "server.js"]

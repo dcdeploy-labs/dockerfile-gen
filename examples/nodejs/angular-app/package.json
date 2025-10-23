@@ -1,0 +1,1 @@
+{"name": "angular-simple", "version": "1.0.0", "scripts": {"build": "echo \"Build complete\" && mkdir -p dist && echo \"<h1>Hello Angular!</h1>\" > dist/index.html"}, "dependencies": {}}

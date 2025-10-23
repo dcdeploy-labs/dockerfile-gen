@@ -1,0 +1,13 @@
+# Remote Testing Configuration
+# Copy this file to remote-config and update with your remote server details
+
+# SSH connection details (required for remote testing)
+REMOTE_HOST=user@your-server.com
+
+# Remote directory path (optional, default: /tmp/dockerfile-gen-test)
+REMOTE_PATH=/tmp/dockerfile-gen-test
+
+# Example usage:
+# 1. Copy this file: cp remote-config.example remote-config
+# 2. Edit remote-config with your server details
+# 3. Run: source remote-config && ./test-remote.sh express-app

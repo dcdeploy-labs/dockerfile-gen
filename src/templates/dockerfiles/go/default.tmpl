@@ -1,0 +1,58 @@
+# Build stage
+FROM {{BUILD_IMAGE}} AS builder
+
+# Set ARG variables
+{{BUILD_ARG_VARS}}
+
+# Set environment variables
+{{BUILD_ENV_VARS}}
+
+# Set the working directory
+WORKDIR {{WORKDIR}}
+
+# Install system dependencies
+{{BUILD_SYSTEM_DEPS}}
+
+# Additional RUN commands
+{{BUILD_ADDITIONAL_RUN_CMDS}}
+
+# Copy go mod files
+COPY go.mod go.sum ./
+
+# Download dependencies
+RUN go mod download
+
+# Copy source code
+COPY . .
+
+# Build the application
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
+
+# Final stage
+FROM {{RUN_IMAGE}}
+
+# Set ARG variables
+{{RUNTIME_ARG_VARS}}
+
+# Set environment variables
+{{RUNTIME_ENV_VARS}}
+
+# Set the working directory
+WORKDIR {{WORKDIR}}
+
+# Install system dependencies
+{{RUNTIME_SYSTEM_DEPS}}
+
+# Additional RUN commands
+{{RUNTIME_ADDITIONAL_RUN_CMDS}}
+
+WORKDIR /root/
+
+# Copy the binary from builder stage
+COPY --from=builder /app/main .
+
+# Expose port
+EXPOSE {{PORT}}
+
+# Run the binary
+CMD ["./main"]

@@ -1,0 +1,65 @@
+# Build stage
+FROM {{BUILD_IMAGE}} AS build
+
+# Set ARG variables
+{{BUILD_ARG_VARS}}
+
+# Set environment variables
+{{BUILD_ENV_VARS}}
+
+# Set the working directory
+WORKDIR {{WORKDIR}}
+
+# Install system dependencies
+{{BUILD_SYSTEM_DEPS}}
+
+# Additional RUN commands
+{{BUILD_ADDITIONAL_RUN_CMDS}}
+
+# Copy package files
+COPY {{PACKAGE_FILES}} ./
+
+# Install all dependencies (including dev dependencies for build)
+RUN {{BUILD_INSTALL_CMD}}
+
+# Copy source code
+COPY . .
+
+# Build the application
+RUN {{BUILD_CMD}}
+
+# Production stage
+FROM {{RUN_IMAGE}}
+
+# Set ARG variables
+{{RUNTIME_ARG_VARS}}
+
+# Set environment variables
+{{RUNTIME_ENV_VARS}}
+
+# Set the working directory
+WORKDIR {{WORKDIR}}
+
+# Install system dependencies
+{{RUNTIME_SYSTEM_DEPS}}
+
+# Additional RUN commands
+{{RUNTIME_ADDITIONAL_RUN_CMDS}}
+
+# Copy package files
+COPY {{PACKAGE_FILES}} ./
+
+# Install only production dependencies
+RUN {{RUNTIME_INSTALL_CMD}}
+
+# Copy built application from build stage
+COPY --from=build /app/{{BUILD_OUTPUT_DIR}} ./{{BUILD_OUTPUT_DIR}}
+
+# Copy other necessary files
+COPY --from=build /app/package.json ./
+
+# Expose the port the app runs on
+EXPOSE {{PORT}}
+
+# Define the command to run the application
+CMD {{START_CMD}}
