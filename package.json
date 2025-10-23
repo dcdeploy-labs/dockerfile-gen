@@ -44,11 +44,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/saggiyogesh/dockerfile-gen.git"
+    "url": "git+https://github.com/dcdeploy-labs/dockerfile-gen.git"
   },
-  "homepage": "https://github.com/saggiyogesh/dockerfile-gen#readme",
+  "homepage": "https://github.com/dcdeploy-labs/dockerfile-gen#readme",
   "bugs": {
-    "url": "https://github.com/saggiyogesh/dockerfile-gen/issues"
+    "url": "https://github.com/dcdeploy-labs/dockerfile-gen/issues"
   },
   "publishConfig": {
     "access": "public"
