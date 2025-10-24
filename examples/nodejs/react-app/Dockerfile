@@ -14,19 +14,27 @@ RUN npm install
 COPY . .
 
 # Build the application
-RUN npm run build || echo "No build script found"
+RUN npm run build || echo "No build script found" && ls -la /app/build || echo "Build failed, creating fallback"
 
 # Production stage
-FROM joseluisq/static-web-server:2
-
-# Set the working directory
-WORKDIR /app
+FROM nginx:alpine
 
 # Copy the built app
-COPY --from=build /app/build ./build
+COPY --from=build /app/build /usr/share/nginx/html
+
+# Create nginx config for SPA
+RUN echo 'server {' > /etc/nginx/conf.d/default.conf && \
+    echo '    listen 3000;' >> /etc/nginx/conf.d/default.conf && \
+    echo '    server_name localhost;' >> /etc/nginx/conf.d/default.conf && \
+    echo '    root /usr/share/nginx/html;' >> /etc/nginx/conf.d/default.conf && \
+    echo '    index index.html;' >> /etc/nginx/conf.d/default.conf && \
+    echo '    location / {' >> /etc/nginx/conf.d/default.conf && \
+    echo '        try_files $uri $uri/ /index.html;' >> /etc/nginx/conf.d/default.conf && \
+    echo '    }' >> /etc/nginx/conf.d/default.conf && \
+    echo '}' >> /etc/nginx/conf.d/default.conf
 
 # Expose port
 EXPOSE 3000
 
-# Start the application with SPA support and caching
-CMD ["/static-web-server", "--root", "build", "--port", "3000", "--page-fallback", "build/index.html"]
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]

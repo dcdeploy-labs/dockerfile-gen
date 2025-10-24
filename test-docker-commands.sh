@@ -64,7 +64,7 @@ copy_to_remote() {
     
     # Generate Dockerfile using published dockerfile-gen tool
     print_status "Generating Dockerfile using dockerfile-gen..."
-    npx @dcdeploy/dockerfile-gen@1.0.3 "$TEMP_DIR" --output "$TEMP_DIR/Dockerfile" --verbose
+    npx @dcdeploy/dockerfile-gen@1.0.4 "$TEMP_DIR" --output "$TEMP_DIR/Dockerfile" --verbose
     
     # Copy to remote server
     scp -r "$TEMP_DIR" $REMOTE_HOST:$REMOTE_PATH/$EXAMPLE_NAME
