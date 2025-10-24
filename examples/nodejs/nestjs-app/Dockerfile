@@ -1,20 +1,62 @@
-# Use the official Node.js runtime as the base image
-FROM node:18-alpine
+# Build stage
+FROM node:22 AS build
 
-# Set the working directory in the container
+# Set ARG variables
+
+
+# Set environment variables
+
+
+# Set the working directory
 WORKDIR /app
 
+# Install system dependencies
+
+
+# Additional RUN commands
+
+
 # Copy package files
-COPY package.json package-lock.json ./
+COPY package.json* ./
 
-# Install dependencies
-RUN npm ci --only=production
+# Install all dependencies (including dev dependencies for build)
+RUN npm install
 
-# Copy the rest of the application code
+# Copy source code
 COPY . .
 
 # Build the application
-RUN npm run build
+RUN npm run build || echo "No build script found"
+
+# Production stage
+FROM node:22-alpine
+
+# Set ARG variables
+
+
+# Set environment variables
+
+
+# Set the working directory
+WORKDIR /app
+
+# Install system dependencies
+
+
+# Additional RUN commands
+
+
+# Copy package files
+COPY package.json* ./
+
+# Install only production dependencies
+RUN npm install --only=production
+
+# Copy built application from build stage
+COPY --from=build /app/dist ./dist
+
+# Copy other necessary files
+COPY --from=build /app/package.json ./
 
 # Expose the port the app runs on
 EXPOSE 3000

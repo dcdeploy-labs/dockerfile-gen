@@ -45,21 +45,15 @@ const LANGUAGE_PATTERNS = {
         dependencies: ['nuxt'],
         scripts: ['nuxt']
       },
-      'fastify': {
-        files: ['src/index.ts', 'src/server.ts', 'index.js', 'server.js'],
-        dependencies: ['fastify'],
-        devDependencies: ['typescript', 'ts-node', '@types/node'],
+      'nodejs-ts': {
+        files: ['src/index.ts', 'src/server.ts', 'src/main.ts', 'tsconfig.json'],
+        dependencies: ['express', 'fastify', '@nestjs/core', 'koa', 'hapi'],
+        devDependencies: ['typescript', 'ts-node', '@types/node', '@types/express'],
         scripts: ['tsc', 'ts-node']
       },
-      'express-ts': {
-        files: ['src/server.ts', 'tsconfig.json'],
-        dependencies: ['express'],
-        devDependencies: ['typescript', 'ts-node', '@types/express'],
-        scripts: ['tsc', 'ts-node']
-      },
-      'express': {
-        files: ['app.js', 'server.js', 'index.js'],
-        dependencies: ['express'],
+      'nodejs-js': {
+        files: ['app.js', 'server.js', 'index.js', 'main.js'],
+        dependencies: ['express', 'fastify', '@nestjs/core', 'koa', 'hapi'],
         scripts: []
       },
       'nest': {
@@ -333,8 +327,8 @@ async function detectFramework(projectPath, language, config, files, packageJson
         return framework;
       }
     } else {
-      // For regular frameworks, any condition can match
-      if (hasFrameworkFiles || hasFrameworkDeps || hasFrameworkDevDeps || hasFrameworkScripts) {
+      // For regular frameworks, require dependencies to match (not just files)
+      if (hasFrameworkDeps && (hasFrameworkFiles || hasFrameworkDevDeps || hasFrameworkScripts)) {
         return framework;
       }
     }

@@ -2,31 +2,31 @@
 FROM node:22-alpine
 
 # Set ARG variables
-
+{{ARG_VARS}}
 
 # Set environment variables
-
+{{ENV_VARS}}
 
 # Set the working directory in the container
-WORKDIR /app
+WORKDIR {{WORKDIR}}
 
 # Install system dependencies
-
+{{SYSTEM_DEPS}}
 
 # Additional RUN commands
-
+{{ADDITIONAL_RUN_CMDS}}
 
 # Copy package files
-COPY package.json* ./
+COPY {{PACKAGE_FILES}} ./
 
 # Install dependencies
-RUN npm install --only=production
+RUN {{INSTALL_CMD}}
 
 # Copy the rest of the application code
 COPY . .
 
 # Expose the port the app runs on
-EXPOSE 3000
+EXPOSE {{PORT}}
 
 # Define the command to run the application
-CMD ["npm", "start"]
+CMD {{START_CMD}}
