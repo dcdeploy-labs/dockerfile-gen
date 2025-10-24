@@ -45,6 +45,12 @@ const LANGUAGE_PATTERNS = {
         dependencies: ['nuxt'],
         scripts: ['nuxt']
       },
+      'fastify': {
+        files: ['src/index.ts', 'src/server.ts', 'index.js', 'server.js'],
+        dependencies: ['fastify'],
+        devDependencies: ['typescript', 'ts-node', '@types/node'],
+        scripts: ['tsc', 'ts-node']
+      },
       'express-ts': {
         files: ['src/server.ts', 'tsconfig.json'],
         dependencies: ['express'],

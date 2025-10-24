@@ -1,5 +1,5 @@
 # Build stage
-FROM {{BUILD_IMAGE}} AS build
+FROM node:22 AS build
 
 # Set ARG variables
 {{BUILD_ARG_VARS}}
@@ -19,7 +19,7 @@ WORKDIR {{WORKDIR}}
 # Copy package files
 COPY {{PACKAGE_FILES}} ./
 
-# Install dependencies
+# Install all dependencies (including dev dependencies for build)
 RUN {{BUILD_INSTALL_CMD}}
 
 # Copy source code
@@ -29,7 +29,7 @@ COPY . .
 RUN {{BUILD_CMD}}
 
 # Production stage
-FROM joseluisq/static-web-server:2
+FROM node:22-alpine
 
 # Set ARG variables
 {{RUNTIME_ARG_VARS}}
@@ -46,11 +46,20 @@ WORKDIR {{WORKDIR}}
 # Additional RUN commands
 {{RUNTIME_ADDITIONAL_RUN_CMDS}}
 
-# Copy the built app
+# Copy package files
+COPY {{PACKAGE_FILES}} ./
+
+# Install only production dependencies
+RUN {{RUNTIME_INSTALL_CMD}}
+
+# Copy built application from build stage
 COPY --from=build /app/{{BUILD_OUTPUT_DIR}} ./{{BUILD_OUTPUT_DIR}}
 
-# Expose port
+# Copy other necessary files
+COPY --from=build /app/package.json ./
+
+# Expose the port the app runs on
 EXPOSE {{PORT}}
 
-# Start the application with SPA support and caching
-CMD ["--root", "./{{BUILD_OUTPUT_DIR}}", "--port", "{{PORT}}", "--page-fallback", "./{{BUILD_OUTPUT_DIR}}/index.html", "--cache-control-headers", "true"]
+# Define the command to run the application
+CMD {{RUNTIME_CMD}}

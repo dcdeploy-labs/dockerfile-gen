@@ -1,16 +1,21 @@
 {
   "name": "fastify-ts-example",
   "version": "1.0.0",
+  "main": "dist/index.js",
   "dependencies": {
     "fastify": "^4.20.0",
     "@fastify/cors": "^8.2.0",
+    "@fastify/helmet": "^11.1.0",
+    "@fastify/rate-limit": "^9.0.0"
+  },
+  "devDependencies": {
     "@types/node": "^20.0.0",
     "typescript": "^5.0.0",
     "ts-node": "^10.9.0"
   },
   "scripts": {
-    "start": "node dist/server.js",
-    "dev": "ts-node src/server.ts",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
     "build": "tsc"
   }
 }

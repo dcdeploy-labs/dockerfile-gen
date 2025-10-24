@@ -276,6 +276,9 @@ export async function processDockerfileTemplate(templatePath, projectPath, langu
     variables.BUILD_INSTALL_CMD = buildVariables.INSTALL_CMD;
     variables.RUNTIME_INSTALL_CMD = runtimeVariables.INSTALL_CMD;
     
+    // Add runtime command
+    variables.RUNTIME_CMD = runtimeVariables.START_CMD;
+    
     // Detect TypeScript output directory for TypeScript frameworks
     if (language === 'nodejs' && (options.framework?.includes('ts') || options.framework?.includes('typescript'))) {
       variables.BUILD_OUTPUT_DIR = await detectTypeScriptOutputDir(projectPath);

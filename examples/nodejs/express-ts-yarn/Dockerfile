@@ -1,20 +1,8 @@
 # Build stage
-FROM node:22 as build
-
-# Set ARG variables
-ARG NEXT_URL=https://dsdgfdg
-
-# Set environment variables
-
+FROM node:22 AS build
 
 # Set the working directory
 WORKDIR /app
-
-# Install system dependencies
-
-
-# Additional RUN commands
-
 
 # Copy package files
 COPY package.json yarn.lock ./
@@ -31,20 +19,8 @@ RUN yarn build || echo "No build script found"
 # Production stage
 FROM node:22-alpine
 
-# Set ARG variables
-ARG NEXT_URL=https://dsdgfdg
-
-# Set environment variables
-
-
 # Set the working directory
 WORKDIR /app
-
-# Install system dependencies
-
-
-# Additional RUN commands
-
 
 # Copy package files
 COPY package.json yarn.lock ./

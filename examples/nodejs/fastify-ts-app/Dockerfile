@@ -1,20 +1,8 @@
 # Use the official Node.js runtime as the base image
 FROM node:22-alpine
 
-# Set ARG variables
-
-
-# Set environment variables
-
-
 # Set the working directory in the container
 WORKDIR /app
-
-# Install system dependencies
-
-
-# Additional RUN commands
-
 
 # Copy package files
 COPY package.json* ./

@@ -29,4 +29,4 @@ COPY --from=build /app/dist ./dist
 EXPOSE 3000
 
 # Start the application with SPA support and caching
-CMD ["--root", "dist", "--port", "3000", "--page-fallback", "dist/index.html"]
+CMD ["--root", "./dist", "--port", "3000", "--page-fallback", "./dist/index.html", "--cache-control-headers", "true"]
