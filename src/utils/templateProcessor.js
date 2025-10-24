@@ -246,7 +246,7 @@ export async function processDockerfileTemplate(templatePath, projectPath, langu
     const runtimeVariables = getTemplateVariables(packageManager, false);
     
     // Start with build variables as base
-    const variables = { ...buildVariables };
+    const variables = { ...buildVariables, ...runtimeVariables };
     
     // Add default image variables based on language
     const defaultImages = getDefaultImages(language);
@@ -275,9 +275,6 @@ export async function processDockerfileTemplate(templatePath, projectPath, langu
     // Add separate install commands for build and runtime stages
     variables.BUILD_INSTALL_CMD = buildVariables.INSTALL_CMD;
     variables.RUNTIME_INSTALL_CMD = runtimeVariables.INSTALL_CMD;
-    
-    // Add runtime command
-    variables.RUNTIME_CMD = runtimeVariables.START_CMD;
     
     // Detect TypeScript output directory for TypeScript frameworks
     if (language === 'nodejs' && (options.framework?.includes('ts') || options.framework?.includes('typescript'))) {
