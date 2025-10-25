@@ -46,6 +46,8 @@ WORKDIR /app
 # Additional RUN commands
 
 
+WORKDIR /root/
+
 # Copy the binary from builder stage
 COPY --from=builder /app/main .
 

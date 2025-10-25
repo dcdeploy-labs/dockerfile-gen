@@ -28,5 +28,8 @@ COPY . .
 # Expose the port the app runs on
 EXPOSE {{PORT}}
 
-# Define the command to run the application
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "{{PORT}}"]
+# Set default workers count
+ENV DCD_CPU=1
+
+# Define the command to run the application with dynamic workers
+CMD uvicorn {{PYTHON_APP_ENTRY}} --host 0.0.0.0 --port {{PORT}} --workers ${DCD_CPU} --timeout-keep-alive 120 --timeout-graceful-shutdown 30

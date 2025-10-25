@@ -31,5 +31,8 @@ RUN python manage.py collectstatic --noinput
 # Expose the port the app runs on
 EXPOSE {{PORT}}
 
-# Define the command to run the application
-CMD ["gunicorn", "--bind", "0.0.0.0:{{PORT}}", "your_project.wsgi:application"]
+# Set default workers count
+ENV DCD_CPU=1
+
+# Define the command to run the application with dynamic workers
+CMD gunicorn --bind 0.0.0.0:{{PORT}} --workers ${DCD_CPU} --timeout 120 --keep-alive 5 --max-requests 1000 {{PYTHON_APP_ENTRY}}

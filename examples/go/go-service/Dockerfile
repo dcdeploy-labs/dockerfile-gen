@@ -4,9 +4,6 @@ FROM golang:1.21-alpine AS builder
 # Set the working directory
 WORKDIR /app
 
-# Install git and ca-certificates
-RUN apk add --no-cache git ca-certificates
-
 # Copy go mod files
 COPY go.mod go.sum ./
 
@@ -22,8 +19,8 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
 # Final stage
 FROM alpine:latest
 
-# Install ca-certificates
-RUN apk --no-cache add ca-certificates
+# Set the working directory
+WORKDIR /app
 
 WORKDIR /root/
 
@@ -31,7 +28,7 @@ WORKDIR /root/
 COPY --from=builder /app/main .
 
 # Expose port
-EXPOSE 8080
+EXPOSE 3000
 
 # Run the binary
 CMD ["./main"]

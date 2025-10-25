@@ -125,6 +125,78 @@ function cleanEmptyCommentBlocks(content) {
 }
 
 /**
+ * Detect Python application entry point (module:variable)
+ * Looks for common patterns like app = Flask(...) or app = FastAPI(...)
+ * @param {string} projectPath - Path to the project directory
+ * @param {string} framework - Framework name (flask, fastapi, etc.)
+ * @returns {Promise<string>} Module path (e.g., "app:app", "main:app")
+ */
+async function detectPythonAppEntryPoint(projectPath, framework) {
+  try {
+    // Common file patterns to check
+    const commonFiles = ['app.py', 'main.py', 'application.py', 'wsgi.py', 'server.py'];
+    const allFiles = await fs.readdir(projectPath);
+    const pythonFiles = allFiles.filter(f => f.endsWith('.py'));
+    
+    // Try common files first
+    const filesToCheck = [...commonFiles.filter(f => pythonFiles.includes(f)), ...pythonFiles];
+    
+    for (const file of filesToCheck) {
+      const filePath = path.join(projectPath, file);
+      
+      try {
+        const content = await fs.readFile(filePath, 'utf8');
+        
+        // Pattern 1: Flask app
+        if (framework === 'flask' || framework === 'default') {
+          const flaskMatch = content.match(/^(app|application)\s*=\s*Flask\(/m);
+          if (flaskMatch) {
+            const moduleName = path.basename(file, '.py');
+            return `${moduleName}:${flaskMatch[1]}`;
+          }
+        }
+        
+        // Pattern 2: FastAPI app
+        if (framework === 'fastapi') {
+          const fastapiMatch = content.match(/^(app|application)\s*=\s*FastAPI\(/m);
+          if (fastapiMatch) {
+            const moduleName = path.basename(file, '.py');
+            return `${moduleName}:${fastapiMatch[1]}`;
+          }
+        }
+        
+        // Pattern 3: Django (wsgi.py)
+        if (framework === 'django') {
+          if (file === 'wsgi.py' || content.includes('get_wsgi_application')) {
+            // For Django, look for the project name
+            const projectMatch = content.match(/DJANGO_SETTINGS_MODULE.*?['\"]([\w.]+)\.settings/m);
+            if (projectMatch) {
+              return `${projectMatch[1]}.wsgi:application`;
+            }
+            // Default fallback
+            return 'myproject.wsgi:application';
+          }
+        }
+      } catch (err) {
+        // Skip files that can't be read
+        continue;
+      }
+    }
+    
+    // Default fallbacks
+    if (framework === 'fastapi') return 'main:app';
+    if (framework === 'django') return 'myproject.wsgi:application';
+    return 'app:app'; // Default for Flask
+  } catch (error) {
+    console.warn(`Warning: Could not detect Python entry point: ${error.message}`);
+    // Return defaults based on framework
+    if (framework === 'fastapi') return 'main:app';
+    if (framework === 'django') return 'myproject.wsgi:application';
+    return 'app:app';
+  }
+}
+
+/**
  * Get default base images for a language
  * @param {string} language - Programming language
  * @returns {Object} Default build and run images
@@ -297,6 +369,11 @@ export async function processDockerfileTemplate(templatePath, projectPath, langu
     variables.RUNTIME_ADDITIONAL_RUN_CMDS = getAdditionalRunCommands(language, { 
       additionalRunCmds: [...(options.additionalRunCmds || []), ...(options.runtimeAdditionalRunCmds || [])]
     });
+    
+    // Detect Python application entry point
+    if (language === 'python') {
+      variables.PYTHON_APP_ENTRY = await detectPythonAppEntryPoint(projectPath, options.framework || 'default');
+    }
     
     // Add any additional variables from options
     if (options.variables) {

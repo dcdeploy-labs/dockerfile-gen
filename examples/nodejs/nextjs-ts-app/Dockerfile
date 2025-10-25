@@ -1,11 +1,26 @@
 # Use the official Node.js runtime as the base image
 FROM node:22 AS base
 
+# Set ARG variables
+
+
 # Install dependencies only when needed
 FROM base AS deps
 
+# Set ARG variables
+
+
+# Set environment variables
+
+
 # Set the working directory
 WORKDIR /app
+
+# Install system dependencies
+
+
+# Additional RUN commands
+
 
 # Install dependencies
 COPY package.json* ./
@@ -14,8 +29,19 @@ RUN npm install
 # Rebuild the source code only when needed
 FROM base AS builder
 
+# Set ARG variables
+
+
+# Set environment variables
+
+
 # Set the working directory
 WORKDIR /app
+
+# Install system dependencies
+
+
+# Additional RUN commands
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -28,8 +54,20 @@ RUN npm run build || echo "No build script found"
 # Production image, copy all the files and run next
 FROM base AS runner
 
+# Set ARG variables
+
+
+# Set environment variables
+
+
 # Set the working directory
 WORKDIR /app
+
+# Install system dependencies
+
+
+# Additional RUN commands
+
 
 ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1

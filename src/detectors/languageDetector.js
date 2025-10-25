@@ -278,6 +278,30 @@ async function getPackageJson(projectPath) {
 }
 
 /**
+ * Get requirements.txt content if it exists (for Python)
+ * @param {string} projectPath - Path to the project directory
+ * @returns {Promise<Array<string>|null>} Array of dependencies or null
+ */
+async function getRequirementsTxt(projectPath) {
+  try {
+    const requirementsPath = path.join(projectPath, 'requirements.txt');
+    const content = await fs.readFile(requirementsPath, 'utf8');
+    const dependencies = content
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line && !line.startsWith('#'))
+      .map(line => {
+        const match = line.match(/^([a-zA-Z0-9_-]+[a-zA-Z0-9_.-]*)/);
+        return match ? match[1].toLowerCase() : null;
+      })
+      .filter(Boolean);
+    return dependencies;
+  } catch (error) {
+    return null;
+  }
+}
+
+/**
  * Detect framework within a language
  * @param {string} projectPath - Path to the project directory
  * @param {string} language - Programming language
@@ -289,6 +313,12 @@ async function getPackageJson(projectPath) {
 async function detectFramework(projectPath, language, config, files, packageJson) {
   if (!config.frameworks) {
     return 'default';
+  }
+  
+  // Get Python dependencies if this is a Python project
+  let pythonDeps = null;
+  if (language === 'python') {
+    pythonDeps = await getRequirementsTxt(projectPath);
   }
   
   for (const [framework, frameworkConfig] of Object.entries(config.frameworks)) {
@@ -303,6 +333,16 @@ async function detectFramework(projectPath, language, config, files, packageJson
       hasFrameworkDeps = frameworkConfig.dependencies.some(dep => 
         packageJson.dependencies[dep] || packageJson.devDependencies?.[dep]
       );
+    }
+    
+    // Check for framework-specific dependencies in requirements.txt (for Python)
+    if (pythonDeps && frameworkConfig.dependencies) {
+      const hasPythonDeps = frameworkConfig.dependencies.some(dep => 
+        pythonDeps.includes(dep.toLowerCase())
+      );
+      if (hasPythonDeps) {
+        hasFrameworkDeps = true;
+      }
     }
     
     // Check for framework-specific devDependencies
@@ -321,8 +361,13 @@ async function detectFramework(projectPath, language, config, files, packageJson
       );
     }
     
-    // For TypeScript frameworks, require both files AND dependencies
-    if (framework.includes('-ts') || framework.includes('typescript')) {
+    // For Python frameworks, check files AND (dependencies OR devDependencies)
+    if (language === 'python') {
+      if (hasFrameworkFiles && (hasFrameworkDeps || hasFrameworkDevDeps)) {
+        return framework;
+      }
+    } else if (framework.includes('-ts') || framework.includes('typescript')) {
+      // For TypeScript frameworks, require both files AND dependencies
       if ((hasFrameworkFiles || hasFrameworkScripts) && (hasFrameworkDeps || hasFrameworkDevDeps)) {
         return framework;
       }

@@ -1,20 +1,8 @@
 # Use the official Python runtime as the base image
-FROM {{RUN_IMAGE}}
-
-# Set ARG variables
-{{RUNTIME_ARG_VARS}}
-
-# Set environment variables
-{{RUNTIME_ENV_VARS}}
+FROM python:3.11-slim
 
 # Set the working directory in the container
-WORKDIR {{WORKDIR}}
-
-# Install system dependencies
-{{RUNTIME_SYSTEM_DEPS}}
-
-# Additional RUN commands
-{{RUNTIME_ADDITIONAL_RUN_CMDS}}
+WORKDIR /app
 
 # Copy requirements file
 COPY requirements.txt .
@@ -26,10 +14,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Expose the port the app runs on
-EXPOSE {{PORT}}
+EXPOSE 3000
 
 # Set default workers count
 ENV DCD_CPU=1
 
 # Define the command to run the application with dynamic workers
-CMD gunicorn --bind 0.0.0.0:{{PORT}} --workers ${DCD_CPU} --timeout 120 --keep-alive 5 --max-requests 1000 {{PYTHON_APP_ENTRY}}
+CMD uvicorn main:app --host 0.0.0.0 --port 3000 --workers ${DCD_CPU} --timeout-keep-alive 120 --timeout-graceful-shutdown 30

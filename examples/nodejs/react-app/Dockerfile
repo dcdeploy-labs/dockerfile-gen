@@ -1,8 +1,20 @@
-# Build stage
-FROM node:22 AS build
+# Use the official Node.js runtime as the base image
+FROM node:22-alpine
 
-# Set the working directory
+# Set ARG variables
+
+
+# Set environment variables
+
+
+# Set the working directory in the container
 WORKDIR /app
+
+# Install system dependencies
+
+
+# Additional RUN commands
+
 
 # Copy package files
 COPY package.json* ./
@@ -10,23 +22,11 @@ COPY package.json* ./
 # Install dependencies
 RUN npm install
 
-# Copy source code
+# Copy the rest of the application code
 COPY . .
 
-# Build the application
-RUN npm run build || echo "No build script found"
-
-# Production stage
-FROM joseluisq/static-web-server:2
-
-# Set the working directory
-WORKDIR /app
-
-# Copy the built app
-COPY --from=build /app/build ./build
-
-# Expose port
+# Expose the port the app runs on
 EXPOSE 3000
 
-# Start the application with SPA support and caching
-CMD ["--root", "./build", "--port", "3000", "--page-fallback", "./build/index.html", "--cache-control-headers", "true"]
+# Define the command to run the application
+CMD ["npm", "start"]

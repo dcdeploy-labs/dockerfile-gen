@@ -1,20 +1,8 @@
 # Build stage
 FROM node:22 AS build
 
-# Set ARG variables
-
-
-# Set environment variables
-
-
 # Set the working directory
 WORKDIR /app
-
-# Install system dependencies
-
-
-# Additional RUN commands
-
 
 # Copy package files
 COPY package.json* ./
@@ -31,20 +19,8 @@ RUN npm run build || echo "No build script found"
 # Production stage
 FROM node:22-alpine
 
-# Set ARG variables
-
-
-# Set environment variables
-
-
 # Set the working directory
 WORKDIR /app
-
-# Install system dependencies
-
-
-# Additional RUN commands
-
 
 # Copy package files
 COPY package.json* ./

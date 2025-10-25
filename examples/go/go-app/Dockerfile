@@ -1,20 +1,8 @@
 # Build stage
 FROM golang:1.21-alpine AS builder
 
-# Set ARG variables
-ARG NEXT_URL=https://dsdgfdg
-
-# Set environment variables
-
-
 # Set the working directory
 WORKDIR /app
-
-# Install system dependencies
-
-
-# Additional RUN commands
-
 
 # Copy go mod files
 COPY go.mod go.sum ./
@@ -31,20 +19,10 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
 # Final stage
 FROM alpine:latest
 
-# Set ARG variables
-ARG NEXT_URL=https://dsdgfdg
-
-# Set environment variables
-
-
 # Set the working directory
 WORKDIR /app
 
-# Install system dependencies
-
-
-# Additional RUN commands
-
+WORKDIR /root/
 
 # Copy the binary from builder stage
 COPY --from=builder /app/main .
